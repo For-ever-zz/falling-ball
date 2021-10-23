@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script src="js/pixi.min.js"></script>
+    <script>
+		var app = new PIXI.Application(750,1334);
+        document.body.appendChild(app.view);
+		
+		const bgmusic = new Audio("music/bgmusic.ogg");          //音乐
+		const dead = new Audio("music/dead.ogg");
+		const gamemusic = new Audio("music/gamemusic.ogg");
+		const startmusic = new Audio("music/startbtn.ogg");
+		const water = new Audio("music/water.mp3");
+		const go = new Audio("music/go.ogg");
+		const qiu = new Audio("music/qiu.ogg");
+		const black = new Audio("music/black.mp3");
+		
+        var style = {
+            font : '50px 微软雅黑',//加粗 倾斜 字号 字体名称
+            fill : '#F7EDCA',//颜色
+            stroke : '#4a1850',//描边颜色
+            strokeThickness : 5,//描边宽度
+            dropShadow : true,//开启阴影
+            dropShadowColor : '#00FFFF',//阴影颜色
+            dropShadowAngle : Math.PI / 6,//阴影角度
+            dropShadowDistance : 2,//投影距离
+        };
+		var style1 = {
+		    font : '40px 微软雅黑',//加粗 倾斜 字号 字体名称
+		    fill : '#F7EDCA',//颜色
+		    stroke : '#4a1850',//描边颜色
+		    strokeThickness : 5,//描边宽度
+		    dropShadow : true,//开启阴影
+		    dropShadowColor : '#FF4500',//阴影颜色
+		    dropShadowAngle : Math.PI / 6,//阴影角度
+		    dropShadowDistance : 2,//投影距离
+		};
+		
+		var beishu=new PIXI.Text("× 1",style1);
+		var stop=new PIXI.Sprite.fromImage("res/stop.png");
+		var start=new PIXI.Sprite.fromImage("res/start.png");
+        var bg = new PIXI.Sprite.fromImage("res/bg.png");
+		var isStart=false;
+		var ball1=new PIXI.Sprite.fromImage("res/blueball.png");      //初始化游戏
+		var ball2=new PIXI.Sprite.fromImage("res/blackball.png");
+		var ball3=new PIXI.Sprite.fromImage("res/blueball.png");
+		var scoretxt=new PIXI.Text("得分：0",style);
+		app.stage.addChild(bg);
+		app.stage.addChild(ball1);
+		app.stage.addChild(ball2);
+		app.stage.addChild(ball3);
+		ball1.anchor.set(0.5,0.5);
+		ball2.anchor.set(0.5,0.5);
+		ball3.anchor.set(0.5,0.5);
+		ball1.position.set(90,300);
+		ball2.position.set(375,300);
+		ball3.position.set(660,300);
+		bg.addChild(scoretxt);
+		scoretxt.anchor.set(0.5,0.5);
+		scoretxt.position.set(375,40);
+		app.stage.addChild(stop);
+		stop.anchor.x=0.5;
+		stop.x=685;
+		stop.y=1500;
+		stop.alpha=0.5;
+		app.stage.addChild(start);
+		start.anchor.x=0.5;
+		start.x=685;
+		start.y=10;
+		start.visible=false;
+		start.interactive=true;
+		start.buttonMode=true;
+		start.alpha=0.5;
+		app.stage.addChild(beishu);
+		beishu.position.set(30,20);
+		
+		bgmusic.play();
+		var bgs = new PIXI.Sprite.fromImage("res/bg.png");            //初始化界面
+		var startbtn=new PIXI.Sprite.fromImage("res/startg.png");
+		var boom=new PIXI.Sprite.fromImage("res/boom.png");
+		var sign=new PIXI.Text("Designed By Forever.zz",style);
+		app.stage.addChild(bgs);
+		bgs.addChild(startbtn);
+		startbtn.anchor.set(0.5,0.5);
+		startbtn.position.set(375,700);
+		startbtn.scale.set(2,2);
+		startbtn.interactive=true;
+		startbtn.buttonMode=true;
+		startbtn.on("mouseover",stb);
+		function stb(){
+			startbtn.scale.set(2.1,2.1);
+		}
+		startbtn.on("mouseout",stbout);
+		function stbout(){
+			startbtn.scale.set(2,2);
+		}
+		bgs.addChild(boom);
+		boom.anchor.set(0.5,0.5);
+		boom.position.set(375,400);
+		boom.scale.set(5,3.5);
+		bgs.addChild(sign);
+		sign.anchor.set(0.5,0.5);
+		sign.position.set(375,1100);
+		
+		function StartGame(){             //游戏开始函数
+			startmusic.play();
+			bgmusic.pause();
+			gamemusic.play();
+			startbtn.interactive=false;
+			startbtn.buttonMode=false;
+			var speedstop=30;
+			var speedscale=0.08;
+			var a=0;
+			var speedy=20,speedx=1.5;
+			var StartGame=true;
+			var time=new PIXI.Text("3",style);
+			time.alpha=0.5;
+			time.anchor.set(0.5,0.5);
+			time.scale.set(8,8);
+			time.position.set(375,700);
+			app.stage.addChild(time);
+			app.ticker.add(StartGameAnimate);
+			function StartGameAnimate(){
+				if(StartGame===true){
+					
+					
+					a++;
+					if(a==30){
+						go.play();
+					}
+					time.scale.x-=0.1;
+					time.scale.y-=0.1;
+					time.alpha+=0.02;
+					if(a==60){
+						time.text="2";
+						time.scale.set(8,8);
+						time.alpha=0.5;
+					}
+					
+					if(a==90){
+						time.text="Start!!!";
+						time.scale.set(8,8);
+						time.alpha=0.5;
+					}
+					bgs.x+=speedx;
+					bgs.y-=speedy;
+					speedy-=0.8;
+					if(a>120){
+						app.stage.removeChild(bgs);
+						if(time.scale.x<=0){
+							app.stage.removeChild(time);
+							isStart=true;
+							stop.y-=speedstop;
+							if(stop.y<=10){
+								stop.y=10;
+								speed=0;
+								stop.scale.x+=speedscale;
+								water.play();
+								if(stop.scale.x>=1.8){
+									speedscale=-0.08;
+								}
+								else if(stop.scale.x<1){
+									speedscale=0;
+									stop.scale.x=1;
+									stop.interactive=true;
+									stop.buttonMode=true;
+									StartGame=false;
+								}
+							}
+							
+						}
+					}
+				}
+			}
+		}
+		startbtn.on("click",StartGame);
+		
+		stop.on("mouseover",fstopover);
+		stop.on("mouseout",fstopout);
+		stop.on("click",fstop);            //暂停功能
+		function fstopover(){
+			stop.alpha=1;
+		}
+		function fstopout(){
+			stop.alpha=0.5;
+		}
+		function fstop(){
+			gamemusic.pause();
+			water.play();
+			var speedscalestop=0.08;
+			isStart=false;
+			stop.visible=false;
+			start.visible=true;
+			app.ticker.add(animatefstop);
+			function animatefstop(){
+				if(isStart===false){
+				start.scale.x+=speedscalestop;
+				if(start.scale.x>=1.8){
+					speedscalestop=-0.08;
+				}
+				else if(start.scale.x<1){
+					speedscalestop=0;
+					start.scale.x=1;
+					}
+				}
+			}
+		}
+		
+		start.on("mouseover",fstartover);
+		start.on("mouseout",fstartout);
+		function fstartover(){
+			start.alpha=1;
+		}
+		function fstartout(){
+			start.alpha=0.5;
+		}
+		start.on("click",fstart);          //继续功能
+		function fstart(){
+			gamemusic.play();
+			water.play();
+			isStart=true;
+			stop.visible=true;
+			start.visible=false;
+			var speedscalestart=0.08;
+			app.ticker.add(animatefstart);
+			function animatefstart(){
+				if(isStart===true){
+				stop.scale.x+=speedscalestart;
+				if(stop.scale.x>=1.8){
+					speedscalestart=-0.08;
+				}
+				else if(stop.scale.x<1){
+					speedscalestart=0;
+					stop.scale.x=1;
+					}
+				}
+			}
+		}
+		
+		var da=0,xiao=0;
+		var cheng=1;
+		var score=0;
+		var b=0,t=1;                            //球运动函数
+		var speedball=2;
+		var speedball1=speedball;
+		var speedball2=speedball;
+		var speedball3=speedball;
+		ball1.on("click",ball1re);
+		function ball1re(){
+			qiu.play();
+			speedball1=-70;
+		}
+		ball2.on("click",ball2re);
+		function ball2re(){
+			black.play();
+			speedball2=-70;
+		}
+		ball3.on("click",ball3re);
+		function ball3re(){
+			qiu.play();
+			speedball3=-70;
+		}
+		app.ticker.add(animate);
+		function animate(){
+			if(isStart===true){
+				b++;
+				score+=t;
+				beishu.text="× "+cheng;
+				beishu.x=30+Math.random()*(da-xiao)+xiao;
+				beishu.y=20+Math.random()*(da-xiao)+xiao;
+				scoretxt.text="得分："+score;
+				ball1.rotation+=Math.PI/180;
+				ball2.rotation-=Math.PI/180;
+				ball3.rotation+=Math.PI/180;
+				ball1.interactive=true;
+				ball1.buttonMode=true;
+				ball2.interactive=true;
+				ball2.buttonMode=true;
+				ball3.interactive=true;
+				ball3.buttonMode=true;
+				ball1.y+=speedball1;
+				ball2.y+=speedball2;
+				ball3.y+=speedball3;
+				if(ball1.y<=300){
+					ball1.y=300;
+					speedball1=speedball;
+				}
+				if(ball2.y<=300){
+					ball2.y=300;
+					speedball2=speedball;
+				}
+				if(ball3.y<=300){
+					ball3.y=300;
+					speedball3=speedball;
+				}
+				if(b==400){
+					t++;
+					cheng++;
+					da+=2;
+					xiao-=2;
+					beishu.scale.x+=0.3;
+					beishu.scale.y+=0.3;
+					speedball+=2.5;
+					b=0;
+				}
+				if(ball1.y>1450||ball2.y>1450||ball3.y>1450){
+					gamemusic.pause();
+					dead.play();
+					ball1.interactive=false;
+					ball1.buttonMode=false;
+					ball2.interactive=false;
+					ball2.buttonMode=false;
+					ball3.interactive=false;
+					ball3.buttonMode=false;
+					gg=true;
+					isStart=false;
+				}
+			}
+		}
+		
+		var gg=false,speedtxt=10,scaletxt=0.01;                                               //重新开始游戏
+		var restart=new PIXI.Sprite.fromImage("res/restart.png");
+		restart.anchor.set(0.5,0.5);
+		restart.position.set(375,700);
+		restart.scale.set(0,0);
+		app.stage.addChild(restart);
+		var rex=0.01,rey=0.01,rer=Math.PI/9;
+		app.ticker.add(animateGG);
+		function animateGG(){
+				if(gg===true&&isStart===false){
+					start.buttonMode=false;
+					start.interactive=false;
+					stop.buttonMode=false;
+					stop.interactive=false;
+					start.alpha=0.5;
+					stop.alpha=0.5;
+					scoretxt.scale.x+=scaletxt;
+					scoretxt.scale.y+=scaletxt;
+					if(scoretxt.y>300){
+						speedtxt=0;
+					}
+					scoretxt.y+=speedtxt;
+					if(scoretxt.scale.x>=1.5){
+						scaletxt=0;
+					}
+					restart.scale.x+=rex;
+					restart.scale.y+=rey;
+					restart.rotation+=rer;
+					if(restart.scale.x>=1){
+						restart.scale.x=1;
+						restart.scale.y=1;
+						restart.rotation=0;
+						rer=0;
+						rex=0;
+						rey=0;
+						restart.interactive=true;
+						restart.buttonMode=true;
+						gg=false;
+					}
+				}
+			}
+			restart.on("click",restartgame);
+			restart.on("mouseover",restartover);
+			restart.on("mouseout",restartout);
+			function restartover(){
+				restart.scale.set(1.1,1.1);
+			}
+			function restartout(){
+				restart.scale.set(1,1);
+			}
+			function restartgame(){
+				location.reload();
+			}
+			
+    </script>
+</body>
+</html>
